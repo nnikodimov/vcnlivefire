@@ -1,11 +1,11 @@
 #This section cover the existing vCenter deployment.
 vcenter:
-  fqdn: vcsa-01a.corp.local
-  ip: 192.168.110.22
-  username: administrator@vsphere.local
+  fqdn: vcsa-01b.corp.local
+  ip: 192.168.210.22
+  username: administrator@vsphere2.local
   password: VMware1!
   cluster: Cluster-01
-  vds: SiteA-vDS-01
+  vds: Site-B-vDS-01
 
 #The NSX Manager appliace must be deployed from OVA already before running the playbook, you need to provide the credentials set during the deplyment process  
 nsx:
@@ -16,9 +16,18 @@ nsx:
 #The uplink VLAN represent the transit network between the physical switches and the NSX Gateway
 #The overlay network represents the network where the TEP interfaces reside
 #The management network host the management appliances. i.e., vCenter, NSX Manager, Edge Nodes Management Interfaces....
-uplink_vlan_id: '100'
-overlay_vlan_id: '130'
+edge_uplink_left_vlan_id: '300'
+edge_uplink_right_vlan_id: '400'
+overlay_vlan_id: '230'
 management_vlan_id: '0'
+
+tep_subnet:
+  start: "192.168.230.2"
+  end: "192.168.230.62"
+  cidr: "192.168.230.0/24"
+  gateway: "192.168.230.1"
+  dns: "192.168.110.10"
+
 
 #In this section provide the details about the uplink network. The uplink network must be a /28 as a minimum.
 uplink_network:
@@ -32,22 +41,21 @@ uplink_network:
 #In this section provid the details about the mananagement network.
 management_network:
   prefix_length: 24
-  gateway_ip: 192.168.110.1
-  nsx_manager_ip: 192.168.110.15
-  edge01_ip: 192.168.110.19
-  edge02_ip: 192.168.110.20
-  portgroup_name: SiteA-vDS-01-Mgmt
+  gateway_ip: 192.168.210.1
+  nsx_manager_ip: 192.168.210.15
+  edge01_ip: 192.168.210.17
+  edge02_ip: 192.168.210.18
+  portgroup_name: Site-B-vDS-01-Mgmt
   nsxgateway_serviceinterface_present: False #When connecting the DC in a Box to an Untrusted external network (i.e., the Internet set this to True)
   nsxgateway_serviceinterface_ip: 192.168.100.1 #An IP for the service interface on the management network is only required if "nsxgateway_serviceinterface_present" is set to "True"
 
 #Provide Edge Node VMs deployment information
 edge_nodes:
   size: MEDIUM #set to LARGE for TLS decryption and Gateway IDPS, and to XLARGE for Gateway Malware Detection
-  edge1_datastore: esx-01a-local
-  edge1_host: esx-01a.corp.local
-  edge2_datastore: esx-02a-local
-  edge2_host: esx-02a.corp.local
+  edge1_datastore: esx-01b-local
+  edge1_host: esx-01b.corp.local
+  edge2_datastore: esx-02b-local
+  edge2_host: esx-02b.corp.local
   password: VMware1!VMware1!
   dns_servers: 
   - 192.168.110.10
-# - 192.168.110.11 add additional DNS Servers as members of a list

@@ -38,25 +38,25 @@
 
   "transport_zones": [
     {
-      "display_name": "OVERLAY-TZ",
-      "description": "NSX Overlay Transport Zone for DC in a Box",
+      "display_name": "overlay-tz",
+      "description": "NSX Overlay Transport Zone",
       "transport_type": "OVERLAY",
       "uplink_teaming_policy_names": []
     },
     {
-      "display_name": "VLAN-ESX-TZ",
-      "description": "NSX VLAN Transport Zone for ESX Servers part of the DC in a Box",
+      "display_name": "host-vlan-tz",
+      "description": "NSX VLAN Transport Zone for ESX Servers",
       "transport_type": "VLAN",
-      "uplink_teaming_policy_names": [  "uplink-1-active-uplink-2-standby" , "uplink-2-active-uplink-1-standby" ],
-      "host_switch_name": "dcinabox"
+      "uplink_teaming_policy_names": [  "uplink-left-active-uplink-right-standby" , "uplink-right-active-uplink-left-standby" ],
+      "host_switch_name": "host-switch"
     }
     ,
     {
-      "display_name": "VLAN-EDGE-TZ",
-      "description": "NSX VLAN Transport Zone for Edge Nodes part of the DC in a Box",
+      "display_name": "edge-vlan-tz",
+      "description": "NSX VLAN Transport Zone for Edge Nodes",
       "transport_type": "VLAN",
-      "uplink_teaming_policy_names": [  "uplink-1-only" ],
-      "host_switch_name": "dcinabox"
+      "uplink_teaming_policy_names": [  "uplink-left" , "uplink-right" ],
+      "host_switch_name": "host-switch"
     }
   ],
 
@@ -67,37 +67,47 @@
   }, 
 
   "segments": [
-    { "display_name": "DcInABox-Uplink-Trunk",
-      "transport_zone_name": "VLAN-ESX-TZ",
-      "uplink_teaming_policy_name" : "uplink-1-active-uplink-2-standby",
-      "vlan_ids": "{{uplink_vlan_id}},{{management_vlan_id}}"
+    { "display_name": "edge-uplink-left",
+      "transport_zone_name": "host-vlan-tz",
+      "uplink_teaming_policy_name" : "uplink-left-active-uplink-right-standby",
+      "vlan_ids": "{{edge_uplink_left_vlan_id}},{{management_vlan_id}}"
     },
-    { "display_name": "DcInABox-Overlay-Trunk",
-      "transport_zone_name": "VLAN-ESX-TZ",
-      "uplink_teaming_policy_name" : "uplink-2-active-uplink-1-standby",
+    { "display_name": "edge-uplink-right",
+      "transport_zone_name": "host-vlan-tz",
+      "uplink_teaming_policy_name" : "uplink-right-active-uplink-left-standby",
+      "vlan_ids": "{{edge_uplink_right_vlan_id}},{{management_vlan_id}}"
+    },
+    { "display_name": "overlay-trunk",
+      "transport_zone_name": "host-vlan-tz",
+      "uplink_teaming_policy_name" : "uplink-right-active-uplink-left-standby",
       "vlan_ids": "{{overlay_vlan_id}},{{management_vlan_id}}"
     }
   ],
 
 
   "edge_segments": [
-    { "display_name": "Edge-Uplink",
-      "transport_zone_name": "VLAN-EDGE-TZ",
-      "uplink_teaming_policy_name" : "uplink-1-only",
-      "vlan_ids": "{{uplink_vlan_id}}"
+    { "display_name": "vlan-300",
+      "transport_zone_name": "edge-vlan-tz",
+      "uplink_teaming_policy_name" : "uplink-left",
+      "vlan_ids": "{{edge_uplink_left_vlan_id}}"
     },
-    { "display_name": "Edge-Infra",
-      "transport_zone_name": "VLAN-EDGE-TZ",
-      "uplink_teaming_policy_name" : "uplink-1-only",
+    { "display_name": "vlan-400",
+      "transport_zone_name": "edge-vlan-tz",
+      "uplink_teaming_policy_name" : "uplink-right",
+      "vlan_ids": "{{edge_uplink_right_vlan_id}}"
+    },
+    { "display_name": "edge-infra",
+      "transport_zone_name": "edge-vlan-tz",
+      "uplink_teaming_policy_name" : "uplink-left",
       "vlan_ids": "{{management_vlan_id}}"
     }
   ],
 
   "overlay_segments": [
     {
-      "display_name": "INTERNAL",
-      "transport_zone_name": "OVERLAY-TZ",
-      "connectivity_path": "/infra/tier-0s/NSX-GATEWAY",
+      "display_name": "internal",
+      "transport_zone_name": "overlay-tz",
+      "connectivity_path": "/infra/tier-0s/t0-gateway",
       "subnets": [
         {
           "gateway_address": "172.16.20.1/24"
@@ -111,9 +121,9 @@
     ]
     },
     {
-      "display_name": "DMZ",
-      "transport_zone_name": "OVERLAY-TZ",
-      "connectivity_path": "/infra/tier-0s/NSX-GATEWAY",
+      "display_name": "dmz",
+      "transport_zone_name": "overlay-tz",
+      "connectivity_path": "/infra/tier-0s/t0-gateway",
       "subnets": [
         {
           "gateway_address": "172.16.10.1/24"
@@ -131,10 +141,10 @@
 
   "ip_pools": [
     {
-      "display_name": "TEP-IP-POOL",
+      "display_name": "tep-ip-pool",
       "subnets": [
         {
-          "id": "TEP_SUBNET",
+          "id": "tep_subnet",
           "state": "{{state}}",
           "allocation_ranges": [
             {
@@ -154,15 +164,19 @@
       "teaming": {
         "active_list": [
           {
+            "uplink_name": "uplink-1",
+            "uplink_type": "PNIC"
+          },
+          {
             "uplink_name": "uplink-2",
             "uplink_type": "PNIC"
           }
         ],
-        "policy": "FAILOVER_ORDER"
+        "policy": "LOADBALANCE_SRCID"
       },
       "named_teamings" : [
         {
-          "name": "uplink-1-only",
+          "name": "uplink-left",
           "active_list": [
             {
               "uplink_name": "uplink-1",
@@ -170,8 +184,17 @@
             }
           ],
           "policy": "FAILOVER_ORDER"
+        },
+        {
+          "name": "uplink-right",
+          "active_list": [
+            {
+              "uplink_name": "uplink-2",
+              "uplink_type": "PNIC"
+            }
+          ],
+          "policy": "FAILOVER_ORDER"
         }
-
       ],
       "transport_vlan": "{{overlay_vlan_id}}",
       "mtu": "{{mtu}}"
@@ -196,7 +219,7 @@
       },
       "named_teamings" : [
         {
-          "name": "uplink-1-active-uplink-2-standby",
+          "name": "uplink-left-active-uplink-right-standby",
           "active_list": [
             {
               "uplink_name": "uplink-1",
@@ -212,7 +235,7 @@
           "policy": "FAILOVER_ORDER"
         },
         {
-          "name": "uplink-2-active-uplink-1-standby",
+          "name": "uplink-right-active-uplink-left-standby",
           "active_list": [
             {
               "uplink_name": "uplink-2",
@@ -234,7 +257,7 @@
 
   "transport_node_profiles": [
     {
-      "display_name": "esxi-tn-profile",
+      "display_name": "host-tn-profile",
       "description": "Compute Transport Node Profile",
       "host_switches": [
         {
@@ -260,14 +283,14 @@
           "ip_assignment_spec":
             {
               "resource_type": "StaticIpPoolSpec",
-              "ip_pool_name": "TEP-IP-POOL"
+              "ip_pool_name": "tep-ip-pool"
             },
           "transport_zone_endpoints": [
             {
-              "transport_zone_name": "OVERLAY-TZ"
+              "transport_zone_name": "overlay-tz"
             },
             {
-              "transport_zone_name": "VLAN-ESX-TZ"
+              "transport_zone_name": "host-vlan-tz"
             }
           ]
         }
@@ -277,7 +300,7 @@
 
   "transport_nodes": [
     {
-      "display_name": "nsx-edge-01",
+      "display_name": "edge-01b",
       "description": "NSX Edge Node 01",
       "host_switches": [
         {
@@ -302,14 +325,14 @@
           "ip_assignment_spec":
             {
               "resource_type": "StaticIpPoolSpec",
-              "ip_pool_name": "TEP-IP-POOL"
+              "ip_pool_name": "tep-ip-pool"
             },
           "transport_zone_endpoints": [
             {
-              "transport_zone_name": "OVERLAY-TZ"
+              "transport_zone_name": "overlay-tz"
             },
             {
-              "transport_zone_name": "VLAN-EDGE-TZ"
+              "transport_zone_name": "edge-vlan-tz"
             }
           ],
       }],
@@ -324,8 +347,9 @@
             "host": "{{edge_nodes.edge1_host}}",
             "management_network": "{{management_network.portgroup_name}}",
             "data_networks": [
-              "DcInABox-Uplink-Trunk",
-              "DcInABox-Overlay-Trunk",
+              "edge-uplink-left",
+              "edge-uplink-right",
+              "overlay-trunk",
             ],
             "management_port_subnets": [
               {
@@ -346,17 +370,17 @@
           }
         },
         "resource_type": "EdgeNode",
-        "display_name": "nsx-edge-01",
+        "display_name": "edge-01b",
         "node_settings": {
           "allow_ssh_root_login": "True",
           "enable_ssh": "True",
-          "hostname": "nsx-edge-01",
+          "hostname": "edge-01b",
           "dns_servers": "{{edge_nodes.dns_servers}}"
         }
       }
     },
     {
-      "display_name": "nsx-edge-02",
+      "display_name": "edge-02b",
       "description": "NSX Edge Node 02",
       "host_switches": [
         {
@@ -381,14 +405,14 @@
           "ip_assignment_spec":
             {
               "resource_type": "StaticIpPoolSpec",
-              "ip_pool_name": "TEP-IP-POOL"
+              "ip_pool_name": "tep-ip-pool"
             },
           "transport_zone_endpoints": [
             {
-              "transport_zone_name": "OVERLAY-TZ"
+              "transport_zone_name": "overlay-tz"
             },
             {
-              "transport_zone_name": "VLAN-EDGE-TZ"
+              "transport_zone_name": "edge-vlan-tz"
             }
           ],
       }],
@@ -403,8 +427,9 @@
             "host": "{{edge_nodes.edge2_host}}",
             "management_network": "{{management_network.portgroup_name}}",
             "data_networks": [
-              "DcInABox-Uplink-Trunk",
-              "DcInABox-Overlay-Trunk",
+              "edge-uplink-left",
+              "edge-uplink-right",
+              "overlay-trunk",
             ],
             "management_port_subnets": [
               {
@@ -425,11 +450,11 @@
           }
         },
          "resource_type": "EdgeNode",
-         "display_name": "nsx-edge-02",
+         "display_name": "edge-02b",
            "node_settings": {
            "allow_ssh_root_login": "True",
            "enable_ssh": "True",
-           "hostname": "nsx-edge-02",
+           "hostname": "edge-02b",
            "dns_servers": "{{edge_nodes.dns_servers}}"
          }
     }
@@ -444,10 +469,10 @@
       "cluster_profile_binding_id": "91bcaa06-47a1-11e4-8316-17ffc770799b",
       "members": [
         {
-          "transport_node_name": "nsx-edge-01"
+          "transport_node_name": "edge-01b"
         },
         {
-          "transport_node_name": "nsx-edge-02"
+          "transport_node_name": "edge-02b"
         }
       ]
     },

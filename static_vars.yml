@@ -5,7 +5,7 @@
   # Accepts: 'present' to create; 'absent' to delete
   #
   "state": "present",
-  "mtu": "9000",
+  "mtu": "1700",
   #
   "validate_certs": False,
   #
@@ -64,12 +64,12 @@
     { "display_name": "edge-uplink-left",
       "transport_zone_name": "host-vlan-tz",
       "uplink_teaming_policy_name" : "uplink-left-active-uplink-right-standby",
-      "vlan_ids": "{{edge_uplink_left_vlan_id}},{{{overlay_vlan_id}}"
+      "vlan_ids": "{{edge_uplink_left_vlan_id}},{{overlay_vlan_id}}"
     },
     { "display_name": "edge-uplink-right",
       "transport_zone_name": "host-vlan-tz",
       "uplink_teaming_policy_name" : "uplink-right-active-uplink-left-standby",
-      "vlan_ids": "{{edge_uplink_right_vlan_id}},{{{overlay_vlan_id}}"
+      "vlan_ids": "{{edge_uplink_right_vlan_id}},{{overlay_vlan_id}}"
     }
   ],
 
@@ -110,7 +110,7 @@
 
   "edge_uplink_profiles": [
     {
-      "display_name": "edge-uplink-profile",
+      "display_name": "edge-loadbalance-uplink-profile",
       "teaming": {
         "active_list": [
           {
@@ -153,7 +153,7 @@
 
   "host_uplink_profiles": [
     {
-      "display_name": "esx-uplink-profile",
+      "display_name": "host-loadbalance-uplink-profile",
       "teaming": {
         "active_list": [
           {
@@ -207,13 +207,13 @@
 
   "transport_node_profiles": [
     {
-      "display_name": "host-tn-profile",
+      "display_name": "standard-tn-profile",
       "description": "Compute Transport Node Profile",
       "host_switches": [
         {
           "host_switch_profiles": [
             {
-              "name": "esx-uplink-profile",
+              "name": "host-loadbalance-uplink-profile",
               "type": "UplinkHostSwitchProfile"
             }
           ],
@@ -256,7 +256,7 @@
         {
           "host_switch_profiles": [
             {
-              "name": "edge-uplink-profile",
+              "name": "edge-loadbalance-uplink-profile",
               "type": "UplinkHostSwitchProfile"
             }
           ],
@@ -298,8 +298,7 @@
             "management_network": "{{management_network.portgroup_name}}",
             "data_networks": [
               "edge-uplink-left",
-              "edge-uplink-right",
-              "overlay-trunk",
+              "edge-uplink-right"
             ],
             "management_port_subnets": [
               {
@@ -336,7 +335,7 @@
         {
           "host_switch_profiles": [
             {
-              "name": "edge-uplink-profile",
+              "name": "edge-loadbalance-uplink-profile",
               "type": "UplinkHostSwitchProfile"
             }
           ],
@@ -378,8 +377,7 @@
             "management_network": "{{management_network.portgroup_name}}",
             "data_networks": [
               "edge-uplink-left",
-              "edge-uplink-right",
-              "overlay-trunk",
+              "edge-uplink-right"
             ],
             "management_port_subnets": [
               {

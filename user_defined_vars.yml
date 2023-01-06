@@ -21,13 +21,12 @@ edge_uplink_right_vlan_id: '400'
 overlay_vlan_id: '230'
 management_vlan_id: '0'
 
-tep_subnet:
-  start: "192.168.230.2"
-  end: "192.168.230.62"
-  cidr: "192.168.230.0/24"
-  gateway: "192.168.230.1"
-  dns: "192.168.110.10"
-
+tep_range: 
+    start: "192.168.230.2"
+    end: "192.168.230.62"
+    cidr: "192.168.230.0/24"
+    gateway_ip: "192.168.230.1"
+    dns_nameservers: "192.168.110.10"
 
 #In this section provide the details about the uplink network. The uplink network must be a /28 as a minimum.
 uplink_network:

@@ -60,84 +60,32 @@
     }
   ],
 
-  "tep_range": {
-    "start": "192.168.130.5",
-    "end": "192.168.130.254",
-    "cidr": "192.168.130.0/24"
-  }, 
-
   "segments": [
     { "display_name": "edge-uplink-left",
       "transport_zone_name": "host-vlan-tz",
       "uplink_teaming_policy_name" : "uplink-left-active-uplink-right-standby",
-      "vlan_ids": "{{edge_uplink_left_vlan_id}},{{management_vlan_id}}"
+      "vlan_ids": "{{edge_uplink_left_vlan_id}},{{{overlay_vlan_id}}"
     },
     { "display_name": "edge-uplink-right",
       "transport_zone_name": "host-vlan-tz",
       "uplink_teaming_policy_name" : "uplink-right-active-uplink-left-standby",
-      "vlan_ids": "{{edge_uplink_right_vlan_id}},{{management_vlan_id}}"
-    },
-    { "display_name": "overlay-trunk",
-      "transport_zone_name": "host-vlan-tz",
-      "uplink_teaming_policy_name" : "uplink-right-active-uplink-left-standby",
-      "vlan_ids": "{{overlay_vlan_id}},{{management_vlan_id}}"
+      "vlan_ids": "{{edge_uplink_right_vlan_id}},{{{overlay_vlan_id}}"
     }
   ],
 
 
   "edge_segments": [
-    { "display_name": "vlan-300",
+    { "display_name": "vlan300",
       "transport_zone_name": "edge-vlan-tz",
       "uplink_teaming_policy_name" : "uplink-left",
       "vlan_ids": "{{edge_uplink_left_vlan_id}}"
     },
-    { "display_name": "vlan-400",
+    { "display_name": "vlan400",
       "transport_zone_name": "edge-vlan-tz",
       "uplink_teaming_policy_name" : "uplink-right",
       "vlan_ids": "{{edge_uplink_right_vlan_id}}"
-    },
-    { "display_name": "edge-infra",
-      "transport_zone_name": "edge-vlan-tz",
-      "uplink_teaming_policy_name" : "uplink-left",
-      "vlan_ids": "{{management_vlan_id}}"
     }
   ],
-
-  "overlay_segments": [
-    {
-      "display_name": "internal",
-      "transport_zone_name": "overlay-tz",
-      "connectivity_path": "/infra/tier-0s/t0-gateway",
-      "subnets": [
-        {
-          "gateway_address": "172.16.20.1/24"
-        }
-      ],
-      "tags": [
-        {
-            "scope": "zone",
-            "tag": "internal"
-        }
-    ]
-    },
-    {
-      "display_name": "dmz",
-      "transport_zone_name": "overlay-tz",
-      "connectivity_path": "/infra/tier-0s/t0-gateway",
-      "subnets": [
-        {
-          "gateway_address": "172.16.10.1/24"
-        }
-      ],
-      "tags": [
-        {
-            "scope": "zone",
-            "tag": "dmz"
-        }
-    ]
-    }
-  ],
-
 
   "ip_pools": [
     {
@@ -152,7 +100,9 @@
               "end": "{{tep_range.end}}"
             }
           ],
-          "cidr": "{{tep_range.cidr}}"
+          "cidr": "{{tep_range.cidr}}",
+          "gateway_ip": "{{tep_range.gateway_ip}}",
+          "dns_nameservers": "{{tep_range.dns_nameservers}}"
         }
       ]
     }

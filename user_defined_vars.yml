@@ -2,10 +2,10 @@
 vcenter:
   fqdn: vcsa-01b.corp.local
   ip: 192.168.210.22
-  username: administrator@vsphere2.local
+  username: administrator@vsphere.local
   password: VMware1!
-  cluster: Cluster-01
-  vds: Site-B-vDS-01
+  cluster: Cluster-02
+  vds: Site-B-vDS-02
 
 #The NSX Manager appliace must be deployed from OVA already before running the playbook, you need to provide the credentials set during the deplyment process  
 nsx:
@@ -44,17 +44,17 @@ management_network:
   nsx_manager_ip: 192.168.210.15
   edge01_ip: 192.168.210.17
   edge02_ip: 192.168.210.18
-  portgroup_name: Site-B-vDS-01-Mgmt
+  portgroup_name: Site-B-vDS-02-Mgmt
   nsxgateway_serviceinterface_present: False #When connecting the DC in a Box to an Untrusted external network (i.e., the Internet set this to True)
   nsxgateway_serviceinterface_ip: 192.168.100.1 #An IP for the service interface on the management network is only required if "nsxgateway_serviceinterface_present" is set to "True"
 
 #Provide Edge Node VMs deployment information
 edge_nodes:
   size: MEDIUM #set to LARGE for TLS decryption and Gateway IDPS, and to XLARGE for Gateway Malware Detection
-  edge1_datastore: esx-01b-local
-  edge1_host: esx-01b.corp.local
-  edge2_datastore: esx-02b-local
-  edge2_host: esx-02b.corp.local
+  edge1_datastore: esx-02b-local
+  edge1_host: esx-02b.corp.local
+  edge2_datastore: esx-03b-local
+  edge2_host: esx-03b.corp.local
   password: VMware1!VMware1!
   dns_servers: 
   - 192.168.110.10

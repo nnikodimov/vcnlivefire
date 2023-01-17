@@ -18,10 +18,6 @@
   "nsx_node1": {
     "hostname": "{{management_network.nsx_manager_ip}}",
     "mgmt_ip": "{{management_network.nsx_manager_ip}}",
-    "datacenter": "Site",
-    "cluster": "Cluster-01a",
-    "datastore": "esx-011a-local",
-    "portgroup": "SiteA-vDS-10-Management"
   },
 
   "compute_managers": [
@@ -64,23 +60,23 @@
     { "display_name": "edge-uplink-left",
       "transport_zone_name": "host-vlan-tz",
       "uplink_teaming_policy_name" : "uplink-left-active-uplink-right-standby",
-      "vlan_ids": "{{edge_uplink_left_vlan_id}},{{overlay_vlan_id}}"
+      "vlan_ids": "{{edge_uplink_left_vlan_id}},{{overlay_vlan_id}},{{management_vlan_id}}"
     },
     { "display_name": "edge-uplink-right",
       "transport_zone_name": "host-vlan-tz",
       "uplink_teaming_policy_name" : "uplink-right-active-uplink-left-standby",
-      "vlan_ids": "{{edge_uplink_right_vlan_id}},{{overlay_vlan_id}}"
+      "vlan_ids": "{{edge_uplink_right_vlan_id}},{{overlay_vlan_id}},{{management_vlan_id}}"
     }
   ],
 
 
   "edge_segments": [
-    { "display_name": "vlan300",
+    { "display_name": "vlan-300",
       "transport_zone_name": "edge-vlan-tz",
       "uplink_teaming_policy_name" : "uplink-left",
       "vlan_ids": "{{edge_uplink_left_vlan_id}}"
     },
-    { "display_name": "vlan400",
+    { "display_name": "vlan-400",
       "transport_zone_name": "edge-vlan-tz",
       "uplink_teaming_policy_name" : "uplink-right",
       "vlan_ids": "{{edge_uplink_right_vlan_id}}"
@@ -293,6 +289,19 @@
             "vc_username": "{{vcenter.username}}",
             "vc_password": "{{vcenter.password}}",
             "compute": "{{vcenter.cluster}}",
+            "reservation_info": {
+              "memory_reservation": {
+                "reservation_percentage": 0
+              },
+              "cpu_reservation": {
+                "reservation_in_shares": "HIGH_PRIORITY",
+                "reservation_in_mhz": 0
+              }
+            },
+            "resource_allocation": {
+              "cpu_count": 4,
+              "memory_allocation_in_mb": 8192
+            },
             "storage": "{{edge_nodes.edge1_datastore}}",
             "host": "{{edge_nodes.edge1_host}}",
             "management_network": "{{management_network.portgroup_name}}",
@@ -372,6 +381,19 @@
             "vc_username": "{{vcenter.username}}",
             "vc_password": "{{vcenter.password}}",
             "compute": "{{vcenter.cluster}}",
+            "reservation_info": {
+              "memory_reservation": {
+                "reservation_percentage": 0
+              },
+              "cpu_reservation": {
+                "reservation_in_shares": "HIGH_PRIORITY",
+                "reservation_in_mhz": 0
+              }
+            },
+            "resource_allocation": {
+              "cpu_count": 4,
+              "memory_allocation_in_mb": 8192
+            },
             "storage": "{{edge_nodes.edge2_datastore}}",
             "host": "{{edge_nodes.edge2_host}}",
             "management_network": "{{management_network.portgroup_name}}",
